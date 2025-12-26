@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fake Job Posting Detection System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: Inter, sans-serif;
+        background-color: #0b0b0b;
+        color: #e6e6e6;
+        margin: 0;
+        padding: 40px;
+      }
+      .header-images {
+        position: relative;
+        width: 100%;
+        height: 110px;
+        margin-bottom: 20px;
+      }
+      .header-img {
+        position: absolute;
+        top: 0;
+        max-height: 90px;
+        opacity: 0.85;
+      }
+      .left-img {
+        left: 0;
+      }
+      .right-img {
+        right: 0;
+      }
+      .container {
+        max-width: 880px;
+        margin: auto;
+        background-color: #141414;
+        padding: 32px;
+        border-radius: 8px;
+        border: 1px solid #262626;
+      }
+      h1 {
+        text-align: center;
+        color: #ff8c00;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .subtitle {
+        text-align: center;
+        font-size: 14px;
+        color: #a1a1a1;
+        margin-bottom: 30px;
+      }
+      label {
+        font-size: 14px;
+        font-weight: 500;
+        display: block;
+        margin-bottom: 8px;
+        color: #d0d0d0;
+      }
+      textarea {
+        width: 100%;
+        height: 170px;
+        padding: 14px;
+        background-color: #0b0b0b;
+        color: #e6e6e6;
+        border: 1px solid #333;
+        border-radius: 6px;
+        font-size: 14px;
+        resize: none;
+      }
+      textarea:focus {
+        outline: none;
+        border-color: #ff8c00;
+      }
+      input[type="file"] {
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      button {
+        margin-top: 18px;
+        background-color: #ff8c00;
+        color: #000;
+        border: none;
+        padding: 10px 28px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #ff9d2e;
+      }
+      .result {
+        margin-top: 34px;
+        padding: 22px;
+        background-color: #0b0b0b;
+        border-radius: 6px;
+        border-left: 4px solid #ff8c00;
+      }
+      .section-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #ff8c00;
+      }
+      .prediction {
+        font-size: 15px;
+        margin-bottom: 14px;
+      }
+      .keywords {
+        margin-top: 10px;
+      }
+      .keyword {
+        display: inline-block;
+        background-color: #1f1f1f;
+        color: #ff8c00;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin: 4px 6px 0 0;
+      }
+      footer {
+        text-align: center;
+        margin-top: 32px;
+        font-size: 12px;
+        color: #7a7a7a;
+      }
+      @media (max-width: 768px) {
+        .header-images {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-images">
+      <img
+        src="{{ url_for('static', filename='fake-2.jpg') }}"
+        class="header-img left-img"
+        alt="Fake Job Illustration"
+      />
+      <img
+        src="{{ url_for('static', filename='fake-jobs-images.jpg') }}"
+        class="header-img right-img"
+        alt="Job Scam Illustration"
+      />
+    </div>
+
+    <div class="container">
+      <h1>Fake Job Posting Detection System</h1>
+      <div class="subtitle">Final Year Academic Project | ML & NLP</div>
+
+      <form method="POST" enctype="multipart/form-data">
+        <label for="jobText">Job Description</label>
+        <textarea
+          id="jobText"
+          name="job_text"
+          placeholder="Paste the job posting content here..."
+        >
+{{ job_text }}</textarea
+        >
+
+        <label for="file">Upload CSV file (optional)</label>
+        <input type="file" id="file" name="file" accept=".csv" />
+
+        <button type="submit">Analyze Job Posting</button>
+      </form>
+
+      {% if prediction %}
+      <div class="result">
+        <div class="section-title">Prediction Result</div>
+        <p class="prediction"><strong>{{ prediction }}</strong></p>
+
+        <div class="section-title">Risk Explanation</div>
+        <p>{{ explanation }}</p>
+
+        <div class="section-title">Suspicious Keywords Identified</div>
+        <div class="keywords" id="keywords"></div>
+      </div>
+      {% endif %} {% if batch_results %}
+      <div class="result">
+        <div class="section-title">Batch Prediction Results</div>
+        <table style="width: 100%; border-collapse: collapse; color: #e6e6e6">
+          <tr>
+            <th style="border-bottom: 1px solid #ff8c00; padding: 6px">
+              Title
+            </th>
+            <th style="border-bottom: 1px solid #ff8c00; padding: 6px">
+              Prediction
+            </th>
+          </tr>
+          {% for row in batch_results %}
+          <tr>
+            <td style="padding: 6px">{{ row.title }}</td>
+            <td style="padding: 6px">{{ row.prediction }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% endif %}
+    </div>
+
+    <footer>© 2025 | Fake Job Detection System | Academic Submission</footer>
+
+    <script>
+      const suspiciousKeywords = [
+        "urgent",
+        "no interview",
+        "whatsapp",
+        "work from home",
+        "easy money",
+        "limited slots",
+        "earn fast",
+        "immediate joining",
+      ];
+      const text = `{{ job_text | lower }}`;
+      const container = document.getElementById("keywords");
+      if (container) {
+        let found = false;
+        suspiciousKeywords.forEach((word) => {
+          if (text.includes(word)) {
+            found = true;
+            const span = document.createElement("span");
+            span.className = "keyword";
+            span.innerText = word;
+            container.appendChild(span);
+          }
+        });
+        if (!found)
+          container.innerText =
+            "No commonly observed scam-related keywords detected.";
+      }
+    </script>
+  </body>
+</html>
